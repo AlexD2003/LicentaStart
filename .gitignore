@@ -1,2 +1,4 @@
 dataset/
 all-mias.tar.gz
+cleaned_dataset/
+tensor_dataset/
