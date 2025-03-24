@@ -27,9 +27,9 @@ def process_image(image_path, output_path):
 
 # Process all images in the folder
 for file_name in os.listdir(input_folder):
-    if file_name.endswith(".pgm"):  # Only process PGM images
+    if file_name.endswith(".png"):  # Only process PGM images
         input_path = os.path.join(input_folder, file_name)
-        output_path = os.path.join(output_tensor_folder, file_name.replace(".pgm", ".pt"))
+        output_path = os.path.join(output_tensor_folder, file_name.replace(".png", ".pt"))
         process_image(input_path, output_path)
 
 print("✅ All images converted to tensors and saved in:", output_tensor_folder)

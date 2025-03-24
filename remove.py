@@ -35,14 +35,19 @@ def remove_artifacts(image_path, output_path):
     # Create a mask with only the largest contour (assumed to be the breast)
     mask = np.zeros_like(binary)
     largest_contour = max(contours, key=cv2.contourArea)
+
+    # Apply morphological closing to smooth edges
+    kernel = np.ones((10, 10), np.uint8)
+    binary = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel)
+
     cv2.drawContours(mask, [largest_contour], -1, (255), thickness=cv2.FILLED)
 
     # Apply the mask to the original image
     cleaned = cv2.bitwise_and(img, img, mask=mask)
 
-    # Remove pectoral muscle (top-left region)
+    # **More aggressive pectoral muscle removal**
     height, width = cleaned.shape
-    triangle = np.array([[0, 0], [int(width * 0.3), 0], [0, int(height * 0.3)]], np.int32)
+    triangle = np.array([[0, 0], [int(width * 0.4), 0], [0, int(height * 0.3)]], np.int32)  # Larger mask
     cv2.fillPoly(mask, [triangle], 0)  # Black-out the pectoral region
     cleaned = cv2.bitwise_and(cleaned, cleaned, mask=mask)
 
@@ -52,11 +57,12 @@ def remove_artifacts(image_path, output_path):
         x, y, w, h = cv2.boundingRect(coords)  # Get bounding box
         cleaned = cleaned[y:y+h, x:x+w]  # Crop to content
 
-    # Contrast Enhancement (CLAHE)
+    # **Contrast Enhancement (CLAHE)**
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     cleaned = clahe.apply(cleaned)
 
-    # Save as 8-bit grayscale (force no transparency)
+    # Save as PNG instead of PGM for better grayscale preservation
+    output_path = output_path.replace(".pgm", ".png")
     cv2.imwrite(output_path, cleaned)
 
 # Process all images
