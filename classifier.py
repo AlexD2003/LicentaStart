@@ -62,7 +62,7 @@ dataset = MammogramDataset("tensor_dataset/", "modified_labels.csv", transform=t
 dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 
 # Initialize model, loss function, and optimizer
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 model = MammogramCNN().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
