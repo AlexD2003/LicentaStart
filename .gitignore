@@ -2,3 +2,5 @@ dataset/
 all-mias.tar.gz
 cleaned_dataset/
 tensor_dataset/
+mammogram_cnn_mias.pth
+datasets/

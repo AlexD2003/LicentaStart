@@ -3,8 +3,8 @@ import numpy as np
 import os
 
 # Input and Output directories
-input_folder = "dataset/"
-output_folder = "cleaned_dataset/"
+input_folder = "datasets/test_data/"
+output_folder = "datasets/cleaned_mias_test/"
 
 os.makedirs(output_folder, exist_ok=True)
 

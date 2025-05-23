@@ -4,8 +4,8 @@ import torchvision.transforms as transforms
 from PIL import Image
 
 # Paths
-input_folder = "cleaned_dataset/"
-output_tensor_folder = "tensor_dataset/"
+input_folder = "datasets/cleaned_mias_test/"
+output_tensor_folder = "datasets/tensor_dataset_mias_test/"
 
 # Create output folder if it doesn’t exist
 os.makedirs(output_tensor_folder, exist_ok=True)

@@ -58,7 +58,7 @@ class MammogramCNN(nn.Module):
 
 # Load dataset
 transform = transforms.Compose([transforms.Normalize((0.5,), (0.5,))])
-dataset = MammogramDataset("tensor_dataset/", "modified_labels.csv", transform=transform)
+dataset = MammogramDataset("datasets/tensor_dataset_mias/", "datasets/modified_labels.csv", transform=transform)
 dataloader = DataLoader(dataset, batch_size=16, shuffle=True)
 
 # Initialize model, loss function, and optimizer
@@ -68,7 +68,7 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # Train the model
-num_epochs = 20
+num_epochs = 10
 for epoch in range(num_epochs):
     running_loss = 0.0
     for images, labels in dataloader:
@@ -85,4 +85,4 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch+1}/{num_epochs}, Loss: {running_loss/len(dataloader)}")
 
 print("Training complete!")
-torch.save(model.state_dict(), "mammogram_cnn.pth")
+torch.save(model.state_dict(), "mammogram_cnn_mias.pth")
