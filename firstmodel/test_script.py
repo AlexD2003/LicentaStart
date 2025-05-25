@@ -5,10 +5,10 @@ import pandas as pd
 import os
 import torchvision.transforms.functional as TF
 from torch import nn
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
-# Dataset class
+# Dataset
 class MammogramDataset(torch.utils.data.Dataset):
     def __init__(self, tensor_folder, label_file, transform=None, target_size=(256, 256)):
         self.tensor_folder = tensor_folder
@@ -29,7 +29,7 @@ class MammogramDataset(torch.utils.data.Dataset):
             image_tensor = self.transform(image_tensor)
         return image_tensor, torch.tensor(label, dtype=torch.long)
 
-# CNN model
+# Model
 class MammogramCNN(nn.Module):
     def __init__(self):
         super(MammogramCNN, self).__init__()
@@ -50,21 +50,10 @@ class MammogramCNN(nn.Module):
         x = self.dropout(torch.relu(self.fc1(x)))
         return self.fc2(x)
 
-
-# Device
+# Setup
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# Transform
-transform = transforms.Compose([
-    transforms.Normalize((0.5,), (0.5,))
-])
-
-# Load full test dataset (all 50 images)
-test_dataset = MammogramDataset(
-    "datasets/tensor_dataset_mias_test/",
-    "datasets/test_labels.csv",
-    transform=transform
-)
+transform = transforms.Compose([transforms.Normalize((0.5,), (0.5,))])
+test_dataset = MammogramDataset("datasets/tensor_dataset_mias_test/", "datasets/test_labels.csv", transform=transform)
 test_loader = DataLoader(test_dataset, batch_size=16, shuffle=False)
 
 # Load model
@@ -72,11 +61,9 @@ model = MammogramCNN().to(device)
 model.load_state_dict(torch.load("mammogram_cnn_mias.pth"))
 model.eval()
 
-# Evaluation
+# Evaluate
 all_preds = []
 all_labels = []
-correct = 0
-total = 0
 
 with torch.no_grad():
     for images, labels in test_loader:
@@ -85,17 +72,21 @@ with torch.no_grad():
         _, predicted = outputs.max(1)
         all_preds.extend(predicted.cpu().numpy())
         all_labels.extend(labels.cpu().numpy())
-        correct += (predicted == labels).sum().item()
-        total += labels.size(0)
 
-# Accuracy
-print(f"Test Accuracy on All 50 Images: {100 * correct / total:.2f}%")
+# Custom logging
+malignant_total = sum(1 for l in all_labels if l == 1)
+malignant_correct = sum(1 for p, l in zip(all_preds, all_labels) if p == l == 1)
+print(f"\n🧬 Malignant cases in test set: {malignant_total}")
+print(f"✅ Correctly detected malignant: {malignant_correct}")
 
-# Confusion matrix
+# Metrics
+print("\n📊 Classification Report:")
+print(classification_report(all_labels, all_preds, target_names=["Benign", "Malignant"]))
+
 cm = confusion_matrix(all_labels, all_preds)
 disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Benign", "Malignant"])
 disp.plot(cmap=plt.cm.Blues)
-plt.title("Confusion Matrix: Benign vs Malignant")
-plt.xlabel("Predicted Label")
-plt.ylabel("True Label")
+plt.title("Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
 plt.show()

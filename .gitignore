@@ -4,3 +4,4 @@ cleaned_dataset/
 tensor_dataset/
 mammogram_cnn_mias.pth
 datasets/
+cbis_ddsm_project/datasets/
