@@ -10,6 +10,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 MODEL_PATH = "resnet18_mammogram.pth"
 DATA_DIR = "datasets/tensor_dataset_mias_test/"
 LABEL_CSV = "datasets/test_labels.csv"
+
 BATCH_SIZE = 16
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
